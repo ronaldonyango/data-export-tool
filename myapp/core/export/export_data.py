@@ -82,7 +82,7 @@ class DataExporter:
         progress_bar = tqdm(total=len(df), desc='Exporting to Excel', unit='row')
 
         # Write DataFrame to Excel file
-        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(file_path) as writer:
             df.to_excel(writer, sheet_name=table_name, index=False)
 
         progress_bar.update(len(df))
