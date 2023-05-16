@@ -5,10 +5,10 @@ import time
 from prompt_toolkit.styles import Style
 from colorama import Fore
 
-from core.query.db_functions import QueryManager
-from core.query.prompter import QueryPrompter
-from core.export.manager import ExportManager
-from core.export.engine import ExportEngine
+from myapp.core.query.db_functions import QueryManager
+from myapp.core.query.prompter import QueryPrompter
+from myapp.core.export.manager import ExportManager
+from myapp.core.export.engine import ExportEngine
 
 # Define the syntax highlighting style
 style = Style.from_dict({
@@ -125,6 +125,28 @@ class Main:
 
         for table_name, query in queries:
             self.export_engine.export_table_data(table_name, query, export_format, output_path)
+
+    def run_script_from_file(self, file_path: str) -> None:
+        """
+        Execute SQL queries from a text or Notepad file.
+
+        Args:
+            file_path (str): The path to the file containing the queries.
+        """
+        try:
+            with open(file_path, "r") as file:
+                queries = file.read().split(';')
+                selected_queries = []
+                for query in queries:
+                    query = query.strip()
+                    if query:
+                        selected_queries.append(("Custom Query", query))
+                self.handle_export(selected_queries)
+                print(Fore.GREEN + "Queries executed successfully!")
+        except FileNotFoundError:
+            print(Fore.RED + "File not found.")
+        except Exception as e:
+            logging.error("Failed to execute queries from file: %s", e)
 
 
 if __name__ == "__main__":
