@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from colorama import Fore
 from prompt_toolkit import prompt
@@ -11,6 +12,9 @@ class QueryPrompter:
     def update_query(query_manager: QueryManager) -> None:
         """
         Update a query in the database.
+
+        :param query_manager: An instance for the QueryManager class.
+        :return: None
         """
         print("\n" + Fore.BLUE + "Available queries:")
         try:
@@ -35,11 +39,8 @@ class QueryPrompter:
         """
         Prompt the user to select a query from the list.
 
-        Args:
-            queries (list): A list of query tuples containing table names and query texts.
-
-        Returns:
-            int: The index of the selected query, or None if no query was selected.
+        :param queries: A list of query tuples containing table names and query texts.
+        :return: The index of the selected query, or None if no query was selected.
         """
 
         query_choice = prompt(
@@ -54,11 +55,8 @@ class QueryPrompter:
         """
         Prompt the user to select multiple queries from the list.
 
-        Args:
-            queries (List[str]): A list of queries.
-
-        Returns:
-            List[str]: The selected queries.
+        :param queries: A list of queries.
+        :return: The selected queries.
         """
         print(Fore.CYAN + "Enter the numbers of the queries to run (separated by commas):")
         QueryPrompter.print_query_list(queries)
@@ -66,15 +64,12 @@ class QueryPrompter:
         return [queries[int(choice) - 1] for choice in query_choices]
 
     @staticmethod
-    def prompt_for_new_query(query_name):
+    def prompt_for_new_query(query_name: Any) -> str | None:
         """
         Prompt the user to enter a new query.
 
-        Args:
-            query_name (str): The name of the query to be updated.
-
-        Returns:
-            str: The new query text, or None if no query was entered.
+        :param query_name: The name of the query to be updated.
+        :return: The new query text, or None if no query was entered.
         """
         print(Fore.CYAN + f"Enter the new query for {query_name} (or 'q' to cancel):")
         new_query = prompt("> ")
@@ -86,6 +81,9 @@ class QueryPrompter:
     def get_custom_query(query_manager: QueryManager) -> tuple:
         """
         Prompt the user to enter a custom query.
+
+        :param query_manager: An instance of the QueryManager class.
+        :return: Custom query entry.
         """
         export_table_name = input(Fore.BLUE + "Enter the name of the table to export: ")
         query = input(Fore.LIGHTYELLOW_EX + "Enter the SQL query to export the table: ")
@@ -103,10 +101,10 @@ class QueryPrompter:
         """
         Update a query in the list of queries.
 
-        Args:
-            queries (list): A list of query tuples containing table names and query texts.
-            query_index (int): The index of the query to be updated.
-            new_query (str): The new query text.
+        :param queries: A list of query tuples containing table names and query texts.
+        :param query_index: The index of the query to be updated.
+        :param new_query: The new query text.
+        :return: None
         """
         export_table_name, _ = queries[query_index]
         queries[query_index] = (export_table_name, new_query)
@@ -117,8 +115,8 @@ class QueryPrompter:
         """
         Print a list of available queries.
 
-        Args:
-            queries (list): A list of query tuples containing table names and query texts.
+        :param queries: A list of query tuples containing table names and query texts.
+        :return: None
         """
         for i, (export_table_name, _) in enumerate(queries, start=1):
             print(Fore.CYAN + f"{i}. {export_table_name}")
@@ -127,6 +125,9 @@ class QueryPrompter:
     def get_preset_query_choice(queries: list) -> None:
         """
         Prompt the user to choose a preset query.
+
+        :param queries: A list of query tuples containing table names and query texts.
+        :return:
         """
         print(Fore.BLUE + "Please select a preset query:")
         for i, (export_table_name, query) in enumerate(queries, start=1):

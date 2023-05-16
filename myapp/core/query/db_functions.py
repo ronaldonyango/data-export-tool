@@ -43,13 +43,12 @@ class QueryManager:
                 )
             """)
 
-    def save_query_to_db(self, table_name: str, query_text: str):
+    def save_query_to_db(self, table_name: str, query_text: str) -> None:
         """
         Save a query to the database.
 
-        Args:
-            table_name (str): The name of the table associated with the query.
-            query_text (str): The text of the query to be saved.
+        :param table_name: The name of the table associated with the query.
+        :param query_text: The text of the query to be saved.
         :return: None
         """
         with self.connection_pool as conn:
@@ -62,12 +61,9 @@ class QueryManager:
         """
         Update a query in the database.
 
-        Args:
-            query_name (str): The name of the query to be updated.
-            new_query (str): The new query text.
-
-        :returns:
-            any: updates the query in the database
+        :param query_name: The name of the query to be updated.
+        :param new_query: The new query text.
+        :return: Updates the query in the database
         """
         try:
             with self.connection_pool as conn:
@@ -82,8 +78,7 @@ class QueryManager:
         """
         Retrieve the list of preset queries from the database.
 
-        Returns:
-            list: A list of query tuples containing table names and query texts.
+        :return: A list of query tuples containing table names and query texts.
         """
         with self.connection_pool as conn:
             cursor = conn.cursor()
@@ -95,12 +90,12 @@ class QueryManager:
         """
         Store the database credentials in the database.
 
-        Args:
-            host (str): The database host.
-            database (str): The name of the database.
-            port (int): The port number.
-            username (str): The username.
-            password (str): The password.
+        :param host: The database host
+        :param database: The name of the database
+        :param port: The port number
+        :param username: The username
+        :param password: The password
+        :returns: None
         """
         with self.connection_pool as conn:
             cursor = conn.cursor()
@@ -113,8 +108,7 @@ class QueryManager:
         """
         Check if database credentials exist.
 
-        Returns:
-            bool: True if credentials exist, False otherwise.
+        :returns: True if credentials exist, False otherwise.
         """
         with self.connection_pool as conn:
             cursor = conn.cursor()
@@ -127,15 +121,13 @@ class QueryManager:
         """
         Test the database connection with the provided credentials.
 
-        Args:
-            host (str): The database host.
-            database (str): The name of the database.
-            port (int): The port number.
-            username (str): The username.
-            password (str): The password.
+        :param host: The database host
+        :param database: The name of the database
+        :param port: The port number
+        :param username: The username
+        :param password: The password
 
-        Returns:
-            bool: True if the connection is successful, False otherwise.
+        :returns: True if the connection is successful, False otherwise.
         """
         try:
             conn = mysql.connect(
@@ -157,8 +149,7 @@ class QueryManager:
         """
         Prompt the user to enter the database credentials.
 
-        Returns:
-            tuple: A tuple containing the host, database, port, username, and password.
+        :returns: A tuple containing the host, database, port, username, and password.
         """
         host = input(Fore.CYAN + "HOST: ")
         database = input(Fore.CYAN + "DATABASE: ")
@@ -171,6 +162,8 @@ class QueryManager:
     def setup_database_credentials(self) -> None:
         """
         Set up the database credentials.
+
+        :return: None
         """
         while True:
             host, database, port, username, password = self.get_database_credentials()

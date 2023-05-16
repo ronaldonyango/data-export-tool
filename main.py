@@ -52,7 +52,8 @@ class Main:
 
     def run(self) -> None:
         """
-        Main function to start the program.
+
+        :return: Main function to start the program.
         """
         print(Fore.BLUE + "-------------------WELCOME TO THE DATA EXPORT TOOL!-------------------\n")
 
@@ -117,8 +118,8 @@ class Main:
 
     def handle_export(self, queries) -> None:
         """
-
-        :type queries: iter
+        :param queries:
+        :return:
         """
         export_format = self.export_manager.get_export_format_choice()
         output_path = self.export_manager.get_output_path()
@@ -130,8 +131,8 @@ class Main:
         """
         Execute SQL queries from a text or Notepad file.
 
-        Args:
-            file_path (str): The path to the file containing the queries.
+        :param file_path: The path to the file containing the queries.
+        :return: None.
         """
 
         try:

@@ -18,6 +18,16 @@ class DataExporter:
         self.database_manager = DatabaseManager()
 
     def export(self, table_name, query, export_format=None, file_name=None, append_data=None, output_path=None):
+        """
+        Export table data to the specified file format.
+        :param table_name: Name of the table to export.
+        :param query: SQL query to fetch the table data.
+        :param export_format: File format to export.
+        :param file_name: Name of the output file(optional)
+        :param append_data: Flag indicating whether to append data to an existing file(optional)
+        :param output_path: Path to the output directory(optional)
+        :returns: None
+        """
         start_time = time.monotonic()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         try:
@@ -72,6 +82,14 @@ class DataExporter:
             logging.info("Export operation completed.")
 
     def _export_to_excel(self, file_path, table_name, query):
+        """
+        Export table data to an Excel file.
+
+        :param file_path: Path to the output Excel file.
+        :param table_name: Name of the table being exported.
+        :param query: SQL query to fetch the table data.
+        :return: None
+        """
         # fetch data from the table
         header, rows = self.database_manager.fetch_table_data(query)
 
@@ -89,6 +107,14 @@ class DataExporter:
         progress_bar.close()
 
     def _export_to_csv(self, file_path, mode, query):
+        """
+        Export table data to a CSV file.
+
+        :param file_path: Path to the output CSV file.
+        :param mode: File write mode ('w' for write, 'a' for append).
+        :param query: SQL query to fetch the table data.
+        :returns: None
+        """
         # fetch data from the table
         header, rows = self.database_manager.fetch_table_data(query)
 
@@ -106,6 +132,13 @@ class DataExporter:
         progress_bar.close()
 
     def _export_to_json(self, file_path, query):
+        """
+        Export table data to a JSON file.
+
+        :param file_path: Path to the output JSON file.
+        :param query: SQL query to fetch the table data.
+        :returns: None
+        """
         # fetch data from the table
         header, rows = self.database_manager.fetch_table_data(query)
 
