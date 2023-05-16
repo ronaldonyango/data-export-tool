@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/myapp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/myapp/main" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/exports" />
+      <excludeFolder url="file://$MODULE_DIR$/myapp/database" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
