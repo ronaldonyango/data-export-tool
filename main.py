@@ -9,6 +9,7 @@ from myapp.core.query.db_functions import QueryManager
 from myapp.core.query.prompter import QueryPrompter
 from myapp.core.export.manager import ExportManager
 from myapp.core.export.engine import ExportEngine
+from settings import queries_in_file
 
 # Define the syntax highlighting style
 style = Style.from_dict({
@@ -86,8 +87,11 @@ class Main:
                 elif choice == "3":
                     self.handle_query_update()
                     exit()
+                elif choice == "4":
+                    table_name = input(Fore.BLUE + "Enter table name: ")
+                    self.run_script_from_file(file_path=queries_in_file, table_name=table_name)
                 else:
-                    print(Fore.LIGHTRED_EX + "Invalid choice. Please enter 1, 2, or 3.")
+                    print(Fore.LIGHTRED_EX + "Invalid choice. Please enter 1 - 4.")
                     continue
 
                 continue_choice = input(Fore.BLUE + "Do you want to export another query? [y/n]: ")
@@ -127,10 +131,11 @@ class Main:
         for table_name, query in queries:
             self.export_engine.export_table_data(table_name, query, export_format, output_path)
 
-    def run_script_from_file(self, file_path: str) -> None:
+    def run_script_from_file(self, table_name, file_path: str) -> None:
         """
         Execute SQL queries from a text or Notepad file.
 
+        :param table_name: Name of the table for data export.
         :param file_path: The path to the file containing the queries.
         :return: None.
         """
@@ -142,7 +147,7 @@ class Main:
                 for query in queries:
                     query = query.strip()
                     if query:
-                        selected_queries.append(("Custom Query", query))
+                        selected_queries.append((f"{table_name}", query))
                 self.handle_export(selected_queries)
                 print(Fore.GREEN + "Queries executed successfully!")
         except FileNotFoundError:
@@ -153,4 +158,4 @@ class Main:
 
 if __name__ == "__main__":
     main = Main()
-    main.run_script_from_file("queries.sql")
+    main.run()

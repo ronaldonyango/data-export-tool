@@ -142,4 +142,3 @@ class QueryPrompter:
             except ValueError:
                 print(Fore.LIGHTRED_EX + "Invalid input. Please enter a number.")
 
-

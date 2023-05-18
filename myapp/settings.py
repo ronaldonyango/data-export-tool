@@ -9,6 +9,7 @@ project_dir = script_path.parent.parent
 # Define the relative paths
 export_dir = project_dir / "exports"
 error_log_file = project_dir / "logs" / "error.log"
+queries_in_file = project_dir / "resources" / "queries.sql"
 
 # Convert paths to optimized string representation
 export_file_path = str(export_dir)

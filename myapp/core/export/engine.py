@@ -2,7 +2,7 @@ import logging
 
 from colorama import Fore
 
-from myapp.core.export.export_data import DataExporter
+from core.export.export_data import DataExporter
 
 
 class ExportEngine:
