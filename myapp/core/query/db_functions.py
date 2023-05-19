@@ -2,6 +2,7 @@ import logging
 import sqlite3
 
 import mysql.connector as mysql
+import psycopg2
 from colorama import Fore
 from prompt_toolkit import prompt
 
@@ -11,6 +12,7 @@ class QueryManager:
         # Create a connection pool to manage SQLite connections
         self.connection_pool = sqlite3.connect("./myapp/database/queries.db", check_same_thread=False)
         self.setup_database()
+        self.setup_database_credentials()
 
     def setup_database(self) -> None:
         """
@@ -39,7 +41,8 @@ class QueryManager:
                     database TEXT,
                     port INTEGER,
                     username TEXT,
-                    password TEXT
+                    password TEXT,
+                    engine TEXT
                 )
             """)
 
@@ -86,7 +89,7 @@ class QueryManager:
             cursor.execute(select_query)
             return cursor.fetchall()
 
-    def store_credentials(self, host: str, database: str, port: str, username: str, password: str) -> None:
+    def store_credentials(self, host: str, database: str, port: str, username: str, password: str, engine: str) -> None:
         """
         Store the database credentials in the database.
 
@@ -95,13 +98,14 @@ class QueryManager:
         :param port: The port number
         :param username: The username
         :param password: The password
+        :param engine: The database engine ("mysql" or "postgresql").
         :returns: None
         """
         with self.connection_pool as conn:
             cursor = conn.cursor()
-            insert_query = "INSERT INTO user_credentials (host, database, port, username, password) VALUES (?, ?, ?, " \
-                           "?, ?)"
-            values = (host, database, port, username, password)
+            insert_query = "INSERT INTO user_credentials (host, database, port, username, password, engine) VALUES (" \
+                           "?, ?, ?, ?, ?, ?)"
+            values = (host, database, port, username, password, engine)
             cursor.execute(insert_query, values)
 
     def credentials_exist(self) -> bool:
@@ -117,7 +121,7 @@ class QueryManager:
             return cursor.fetchone() is not None
 
     @staticmethod
-    def test_database_connection(host: str, database: str, port: str, username: str, password: str) -> bool:
+    def test_mysql_connection(host: str, database: str, port: str, username: str, password: str) -> bool:
         """
         Test the database connection with the provided credentials.
 
@@ -145,6 +149,50 @@ class QueryManager:
             return False
 
     @staticmethod
+    def test_postgresql_connection(host: str, database: str, port: str, username: str, password: str):
+        """
+        Test the database connection with the provided credentials.
+
+        :param host: The database host
+        :param database: The name of the database
+        :param port: The port number
+        :param username: The username
+        :param password: The password
+
+        :returns: True if the connection is successful, False otherwise.
+        """
+        try:
+            conn = psycopg2.connect(
+                host=host,
+                port=port,
+                user=username,
+                password=password,
+                dbname=database,
+                connect_timeout=5
+            )
+            conn.close()
+            return True
+        except psycopg2.DatabaseError as e:
+            logging.error(f"Failed to connect to the PostgreSQL database: {e}")
+            return False
+
+    @staticmethod
+    def select_database_engine() -> str:
+        """
+        Prompt the user to select the database engine.
+
+        :returns: The selected database engine ("mysql" or "postgresql").
+        """
+        while True:
+            engine = input(Fore.BLUE + "Select the database engine (1 - MySQL or 2 - PostgreSQL): ").lower()
+            if engine == "1":
+                return "mysql"
+            elif engine == "2":
+                return "postgresql"
+            else:
+                print(Fore.RED + "Invalid input. Please enter '1' or '2'.")
+
+    @staticmethod
     def get_database_credentials() -> tuple:
         """
         Prompt the user to enter the database credentials.
@@ -165,20 +213,135 @@ class QueryManager:
 
         :return: None
         """
-        while True:
-            host, database, port, username, password = self.get_database_credentials()
+        if self.credentials_exist():
+            option = input(
+                Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or '2' to connect to an existing username: ")
+            if option == "1":
+                engine_option = input(
+                    Fore.LIGHTBLUE_EX + "Enter '1' for MySQL or '2' for PostgreSQL: ")
+                if engine_option == "1":
+                    engine = "mysql"
+                elif engine_option == "2":
+                    engine = "postgresql"
+                else:
+                    print(Fore.RED + "Invalid option. Please try again.")
+                    return
 
-            if self.test_database_connection(host, database, port, username, password):
-                self.store_credentials(host, database, port, username, password)
-                print(Fore.GREEN, "Database credentials saved successfully!")
-                break
+                host, database, port, username, password = self.get_database_credentials()
+                self.store_credentials(host, database, port, username, password, engine)
+                credentials = (host, database, port, username, password, engine)
+            elif option == "2":
+                stored_usernames = self.retrieve_stored_usernames()
+                selected_username = self.select_username(stored_usernames)
+                credentials = self.retrieve_credentials_by_username(selected_username)
             else:
-                print(Fore.LIGHTRED_EX, "Failed to connect to the database. Please check your credentials.")
-                while True:
-                    retry = input(Fore.LIGHTBLUE_EX + "Do you want to retry? (Y/N): ").upper()
-                    if retry == "Y":
-                        break
-                    elif retry == "N":
-                        exit()
+                print(Fore.RED + "Invalid option. Please try again.")
+                return
+        else:
+            option = input(Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or press Enter to exit: ")
+            if option == "1":
+                engine_option = input(
+                    Fore.LIGHTBLUE_EX + "Enter '1' for MySQL or '2' for PostgreSQL: ")
+                if engine_option == "1":
+                    engine = "mysql"
+                elif engine_option == "2":
+                    engine = "postgresql"
+                else:
+                    return
+
+                host, database, port, username, password = self.get_database_credentials()
+                self.store_credentials(host, database, port, username, password, engine)
+                credentials = (host, database, port, username, password, engine)
+            else:
+                return
+
+        if credentials[5] == "mysql":
+            if self.test_mysql_connection(*credentials[:5]):
+                print(Fore.GREEN + "MySQL connection successful!")
+            else:
+                print(Fore.RED + "Failed to connect to the MySQL database. Please check your credentials.")
+        elif credentials[5] == "postgresql":
+            if self.test_postgresql_connection(*credentials[:5]):
+                print(Fore.GREEN + "PostgreSQL connection successful!")
+            else:
+                print(Fore.RED + "Failed to connect to the PostgreSQL database. Please check your credentials.")
+
+        while True:
+            option = input(
+                Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or '2' to connect to another username ("
+                                    "Press Enter to exit): ")
+            if option == "1":
+                host, database, port, username, password = self.get_database_credentials()
+                engine = self.select_database_engine()
+                self.store_credentials(host, database, port, username, password, engine)
+                credentials = (host, database, port, username, password, engine)
+                if credentials[5] == "mysql":
+                    if self.test_mysql_connection(*credentials[:5]):
+                        print(Fore.GREEN + "MySQL connection successful!")
                     else:
-                        print(Fore.LIGHTRED_EX, "Invalid input. Please enter 'Y' or 'N'.")
+                        print(Fore.RED + "Failed to connect to the MySQL database. Please check your credentials.")
+                elif credentials[5] == "postgresql":
+                    if self.test_postgresql_connection(*credentials[:5]):
+                        print(Fore.GREEN + "PostgreSQL connection successful!")
+                    else:
+                        print(Fore.RED + "Failed to connect to the PostgreSQL database. Please check your credentials.")
+            elif option == "2":
+                stored_usernames = self.retrieve_stored_usernames()
+                selected_username = self.select_username(stored_usernames)
+                credentials = self.retrieve_credentials_by_username(selected_username)
+                if credentials[5] == "mysql":
+                    if self.test_mysql_connection(*credentials[:5]):
+                        print(Fore.GREEN + "MySQL connection successful!")
+                    else:
+                        print(Fore.RED + "Failed to connect to the MySQL database. Please check your credentials.")
+                elif credentials[5] == "postgresql":
+                    if self.test_postgresql_connection(*credentials[:5]):
+                        print(Fore.GREEN + "PostgreSQL connection successful!")
+                    else:
+                        print(Fore.RED + "Failed to connect to the PostgreSQL database. Please check your credentials.")
+            else:
+                break
+
+    def retrieve_stored_usernames(self) -> list:
+        """
+        Retrieve the list of stored usernames from the database.
+
+        :return: A list of usernames.
+        """
+        with self.connection_pool as conn:
+            cursor = conn.cursor()
+            select_query = "SELECT username FROM user_credentials"
+            cursor.execute(select_query)
+            return [row[0] for row in cursor.fetchall()]
+
+    @staticmethod
+    def select_username(usernames: list) -> str:
+        """
+        Prompt the user to select a username from the provided list.
+
+        :param usernames: A list of usernames.
+        :return: The selected username.
+        """
+        print(Fore.LIGHTBLUE_EX + "Select a username:")
+        for i, username in enumerate(usernames, start=1):
+            print(Fore.LIGHTBLUE_EX, f"{i}. {username}")
+        while True:
+            selection = input(Fore.LIGHTBLUE_EX + "Enter the number corresponding to the username: ")
+            if selection.isdigit() and int(selection) in range(1, len(usernames) + 1):
+                return usernames[int(selection) - 1]
+            else:
+                print(Fore.LIGHTRED_EX + "Invalid input. Please enter a valid number.")
+
+    def retrieve_credentials_by_username(self, username: str) -> tuple:
+        """
+        Retrieve the stored credentials by the username.
+
+        :param username: The username.
+        :return: A tuple containing the database credentials.
+        """
+        with self.connection_pool as conn:
+            cursor = conn.cursor()
+            select_query = "SELECT host, database, port, username, password, engine FROM user_credentials WHERE " \
+                           "username = ?"
+            cursor.execute(select_query, (username,))
+            return cursor.fetchone()

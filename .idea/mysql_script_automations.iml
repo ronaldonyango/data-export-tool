@@ -6,8 +6,12 @@
       <sourceFolder url="file://$MODULE_DIR$/myapp/main" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/exports" />
       <excludeFolder url="file://$MODULE_DIR$/myapp/database" />
+      <excludeFolder url="file://$MODULE_DIR$/logs" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="removeUnused" value="true" />
   </component>
 </module>

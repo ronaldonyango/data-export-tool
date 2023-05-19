@@ -1,3 +1,4 @@
 exports/
 resources/queries.sql
 myapp/database/
+logs

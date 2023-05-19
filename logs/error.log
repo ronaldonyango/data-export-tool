@@ -89,3 +89,30 @@
 2023-05-17 16:31:05,779 [DEBUG] __init__.run: Running job Job(interval=1, unit=days, do=export_table_data, args=('comment', 'select * from profile_collection limit 50', 'xlsx'), kwargs={}) [line:692]
 2023-05-17 16:31:10,613 [INFO] export_data.export: Export operation completed. [line:82]
 2023-05-17 16:31:10,621 [INFO] schedule_tasks.export_table_data: Data exported successfully! [line:70]
+2023-05-18 11:04:48,871 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 11:04:55,696 [ERROR] db_functions.test_database_connection: Failed to connect to the database: 2003 (HY000): Can't connect to MySQL server on 'localhost:5437' (10061) [line:147]
+2023-05-18 11:14:20,103 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 11:15:23,712 [ERROR] db_functions.test_postgresql_connection: Failed to connect to the PostgreSQL database: invalid dsn: invalid connection option "db"
+ [line:175]
+2023-05-18 11:16:11,451 [ERROR] db_functions.test_postgresql_connection: Failed to connect to the PostgreSQL database: invalid dsn: invalid connection option "db"
+ [line:175]
+2023-05-18 11:17:58,686 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 11:19:03,839 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 11:34:14,057 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 13:53:57,341 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 14:30:38,226 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 14:32:35,383 [ERROR] db_functions.test_postgresql_connection: Failed to connect to the PostgreSQL database: (psycopg2.OperationalError) connection to server at "localhost" (::1), port 3306 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 3306 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8) [line:110]
+2023-05-18 18:50:30,207 [ERROR] db_functions.test_mysql_connection: Failed to connect to the database: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host '23*@meshreportingsvr.mysql.database.azure.com' (11003)
+(Background on this error at: https://sqlalche.me/e/20/4xp6) [line:99]
+2023-05-18 23:20:49,096 [ERROR] db_functions.test_mysql_connection: Failed to connect to the database: Can't load plugin: sqlalchemy.dialects:mysql.pymsql [line:99]
+2023-05-18 23:22:42,982 [ERROR] db_functions.test_mysql_connection: Failed to connect to the database: No module named 'pymysql' [line:99]
+2023-05-18 23:25:48,913 [ERROR] db_functions.test_mysql_connection: Failed to connect to the database: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '23*@meshreportingsvr.mysql.database.azure.com' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8) [line:99]
+2023-05-18 23:29:52,216 [DEBUG] proactor_events.__init__: Using proactor: IocpProactor [line:629]
+2023-05-18 23:31:12,630 [INFO] export_data.export: Export operation completed. [line:82]
+2023-05-18 23:31:12,630 [INFO] engine.export_table_data: Data exported successfully! [line:18]
