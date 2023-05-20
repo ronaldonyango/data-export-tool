@@ -225,11 +225,12 @@ class QueryManager:
 
     def create_new_connection(self) -> None:
         engine_option = input(Fore.LIGHTBLUE_EX + "Enter '1' for MySQL or '2' for PostgreSQL: ")
-        if engine_option not in ["1", "2"]:
-            print(Fore.RED + "Invalid engine option. Please try again.")
+        if engine_option == "1":
+            engine = "mysql"
+        elif engine_option == "2":
+            engine = "postgresql"
+        else:
             return
-
-        engine = "mysql" if engine_option == "1" else "postgresql"
 
         host, database, port, username, password = self.get_database_credentials()
         self.store_credentials(host, database, port, username, password, engine)

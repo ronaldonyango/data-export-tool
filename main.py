@@ -1,10 +1,8 @@
 import logging
 import sys
 import time
-
 from prompt_toolkit.styles import Style
 from colorama import Fore
-
 from myapp.core.query.db_functions import QueryManager
 from myapp.core.query.prompter import QueryPrompter
 from myapp.core.export.manager import ExportManager
@@ -44,7 +42,7 @@ def print_loading_progress():
         time.sleep(delay)
 
 
-class Main:
+class DataExportTool:
     def __init__(self):
         self.query_manager = QueryManager()
         self.query_prompter = QueryPrompter()
@@ -52,10 +50,6 @@ class Main:
         self.export_engine = ExportEngine()
 
     def run(self) -> None:
-        """
-
-        :return: Main function to start the program.
-        """
         print(Fore.BLUE + "-------------------WELCOME TO THE DATA EXPORT TOOL!-------------------\n")
 
         if not self.query_manager.credentials_exist():
@@ -67,18 +61,7 @@ class Main:
 
         while True:
             try:
-                choice = input(
-                    Fore.BLUE +
-                    """
-            +------------------ DATA EXPORT MENU ------------------+
-            |                                                      |
-            |            1. Use preset queries                     |
-            |            2. Enter and save your own query          |
-            |            3. Update an existing query               |
-            |                                                      |
-            +------------------------------------------------------+
-            What would you like to do? """
-                )
+                choice = self.prompt_menu_choice()
 
                 if choice == "1":
                     self.handle_preset_queries()
@@ -86,16 +69,13 @@ class Main:
                     self.handle_custom_query()
                 elif choice == "3":
                     self.handle_query_update()
-                    exit()
                 elif choice == "4":
-                    table_name = input(Fore.BLUE + "Enter table name: ")
-                    self.run_script_from_file(file_path=queries_in_file, table_name=table_name)
+                    self.handle_script_from_file()
                 else:
                     print(Fore.LIGHTRED_EX + "Invalid choice. Please enter 1 - 4.")
                     continue
 
-                continue_choice = input(Fore.BLUE + "Do you want to export another query? [y/n]: ")
-                if continue_choice.lower() != "y":
+                if not self.prompt_continue():
                     break
 
             except KeyboardInterrupt:
@@ -106,6 +86,28 @@ class Main:
             except Exception as e:
                 logging.error(f"An error occurred while exporting table data: {e}")
                 print(Fore.LIGHTRED_EX + f"An error occurred while exporting table data: {e}")
+
+    @staticmethod
+    def prompt_menu_choice():
+        choice = input(
+            Fore.BLUE +
+            """
+            +------------------ DATA EXPORT MENU ------------------+
+            |                                                      |
+            |            1. Use preset queries                     |
+            |            2. Enter and save your own query          |
+            |            3. Update an existing query               |
+            |            4. Run queries from file                  |  
+            |                                                      |
+            +------------------------------------------------------+
+            What would you like to do? """
+        )
+        return choice
+
+    @staticmethod
+    def prompt_continue():
+        choice = input(Fore.BLUE + "Do you want to export another query? [y/n]: ")
+        return choice.lower() == "y"
 
     def handle_preset_queries(self) -> None:
         queries = self.query_manager.retrieve_preset_queries()
@@ -120,11 +122,12 @@ class Main:
         self.query_manager.retrieve_preset_queries()
         self.query_prompter.update_query(self.query_manager)
 
+    def handle_script_from_file(self) -> None:
+        table_name = input(Fore.BLUE + "Enter table name: ")
+        file_path = queries_in_file
+        self.run_script_from_file(table_name, file_path)
+
     def handle_export(self, queries) -> None:
-        """
-        :param queries:
-        :return:
-        """
         export_format = self.export_manager.get_export_format_choice()
         output_path = self.export_manager.get_output_path()
 
@@ -132,14 +135,6 @@ class Main:
             self.export_engine.export_table_data(table_name, query, export_format, output_path)
 
     def run_script_from_file(self, table_name, file_path: str) -> None:
-        """
-        Execute SQL queries from a text or Notepad file.
-
-        :param table_name: Name of the table for data export.
-        :param file_path: The path to the file containing the queries.
-        :return: None.
-        """
-
         try:
             with open(file_path, "r") as file:
                 queries = file.read().split(';')
@@ -147,7 +142,7 @@ class Main:
                 for query in queries:
                     query = query.strip()
                     if query:
-                        selected_queries.append((f"{table_name}", query))
+                        selected_queries.append((table_name, query))
                 self.handle_export(selected_queries)
                 print(Fore.GREEN + "Queries executed successfully!")
         except FileNotFoundError:
@@ -157,5 +152,5 @@ class Main:
 
 
 if __name__ == "__main__":
-    main = Main()
-    main.run()
+    data_export_tool = DataExportTool()
+    data_export_tool.run()
