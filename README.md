@@ -120,6 +120,9 @@
         configure the database connection settings according to your database setup. Additionally, you can define preset 
         queries or customize existing ones based on your requirements. This step ensures that the tool can access the 
         database and retrieve the necessary data for exporting.</li>
+    <li><b>Add the following directories</b>: exports, logs, and resources. In the resources folder, you can add either 
+        .txt or .sql files, with the required format of <code>table name</code> and <code>query</code>separated by a 
+        comma.</li>
     <li><b>Run the tool</b>: Open your command-line interface and navigate to the project directory containing the Data 
         Export and Scheduling Tool. Use the following command to run the tool:<code>python main.py</code><br>
         This command will initiate the tool and display the user interface in the command-line interface.</li>
