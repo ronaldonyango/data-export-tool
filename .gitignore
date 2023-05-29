@@ -1,4 +1,5 @@
 exports/
-resources/queries.sql
+resources/cfye_queries.sql
 myapp/database/
 logs
+resources

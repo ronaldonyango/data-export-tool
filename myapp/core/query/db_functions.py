@@ -207,27 +207,41 @@ class QueryManager:
 
     def setup_database_credentials(self) -> None:
         if self.credentials_exist():
-            option = input(Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or '2' to connect to an existing "
-                                               "username: ")
-            if option == "1":
-                self.create_new_connection()
-            elif option == "2":
-                self.connect_to_existing_username()
-            else:
-                print(Fore.RED + "Invalid option. Please try again.")
-                return
+            while True:
+                option = input(
+                    Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or '2' to connect to an existing "
+                                        "username: ")
+                if option == "":
+                    print(Fore.RED + "Invalid option. Please try again.")
+                elif option == "1":
+                    self.create_new_connection()
+                    break
+                elif option == "2":
+                    self.connect_to_existing_username()
+                    break
+                else:
+                    print(Fore.RED + "Invalid option. Please try again.")
         else:
-            option = input(Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or press Enter to exit: ")
-            if option == "1":
-                self.create_new_connection()
-            else:
-                return
+            while True:
+                option = input(Fore.LIGHTBLUE_EX + "Enter '1' to create a new connection or press Enter to exit: ")
+                if option == "":
+                    print(Fore.RED + "Exiting the program...")
+                    exit()
+                elif option == "1":
+                    self.create_new_connection()
+                    break
+                else:
+                    print(Fore.RED + "Invalid option. Please try again.")
 
     def create_new_connection(self) -> None:
-        engine_option = input(Fore.LIGHTBLUE_EX + "Enter '1' for MySQL or '2' for PostgreSQL: ")
-        if engine_option not in ["1", "2"]:
-            print(Fore.RED + "Invalid engine option. Please try again.")
-            return
+        while True:
+            engine_option = input(Fore.LIGHTBLUE_EX + "Enter '1' for MySQL or '2' for PostgreSQL: ")
+            if engine_option == "":
+                return
+            elif engine_option not in ["1", "2"]:
+                print(Fore.RED + "Invalid engine option. Please try again.")
+            else:
+                break
 
         engine = "mysql" if engine_option == "1" else "postgresql"
 

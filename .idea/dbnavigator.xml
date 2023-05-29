@@ -175,13 +175,13 @@
     </dataset-editor-settings>
     <code-editor-settings>
       <general>
-        <show-object-navigation-gutter value="false" />
+        <show-object-navigation-gutter value="true" />
         <show-spec-declaration-navigation-gutter value="true" />
         <enable-spellchecking value="true" />
-        <enable-reference-spellchecking value="false" />
+        <enable-reference-spellchecking value="true" />
       </general>
       <confirmations>
-        <save-changes value="false" />
+        <save-changes value="true" />
         <revert-changes value="true" />
       </confirmations>
     </code-editor-settings>

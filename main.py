@@ -7,7 +7,7 @@ from myapp.core.query.db_functions import QueryManager
 from myapp.core.query.prompter import QueryPrompter
 from myapp.core.export.manager import ExportManager
 from myapp.core.export.engine import ExportEngine
-from settings import queries_in_file
+from settings import cfye_queries, strive_queries
 
 # Define the syntax highlighting style
 style = Style.from_dict({
@@ -71,8 +71,11 @@ class DataExportTool:
                     self.handle_query_update()
                 elif choice == "4":
                     self.handle_script_from_file()
+                elif choice == "5":
+                    print(Fore.RED + "Exiting the program...")
+                    exit()
                 else:
-                    print(Fore.LIGHTRED_EX + "Invalid choice. Please enter 1 - 4.")
+                    print(Fore.LIGHTRED_EX + "Invalid choice. Please enter 1 - 5.")
                     continue
 
                 if not self.prompt_continue():
@@ -98,7 +101,7 @@ class DataExportTool:
             |            2. Enter and save your own query          |
             |            3. Update an existing query               |
             |            4. Run queries from file                  |  
-            |                                                      |
+            |            5. Exit                                   |
             +------------------------------------------------------+
             What would you like to do? """
         )
@@ -123,9 +126,8 @@ class DataExportTool:
         self.query_prompter.update_query(self.query_manager)
 
     def handle_script_from_file(self) -> None:
-        table_name = input(Fore.BLUE + "Enter table name: ")
-        file_path = queries_in_file
-        self.run_script_from_file(table_name, file_path)
+        file_path = cfye_queries
+        self.run_script_from_file(file_path)
 
     def handle_export(self, queries) -> None:
         export_format = self.export_manager.get_export_format_choice()
@@ -134,15 +136,33 @@ class DataExportTool:
         for table_name, query in queries:
             self.export_engine.export_table_data(table_name, query, export_format, output_path)
 
-    def run_script_from_file(self, table_name, file_path: str) -> None:
+    def run_script_from_file(self, file_path: str) -> None:
         try:
             with open(file_path, "r") as file:
-                queries = file.read().split(';')
+                lines = file.readlines()
                 selected_queries = []
-                for query in queries:
-                    query = query.strip()
-                    if query:
-                        selected_queries.append((table_name, query))
+                table_name = None
+                query = ""
+
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.startswith("--"):  # Skip comment lines
+                        if table_name is None:
+                            parts = line.split(',', 1)
+                            if len(parts) == 2:
+                                table_name = parts[0].strip()
+                                query = parts[1].strip()
+                            else:
+                                print(Fore.RED + f"Invalid line format: {line}")
+                        else:
+                            if line.endswith(";"):
+                                query += " " + line[:-1].strip()
+                                selected_queries.append((table_name, query))
+                                table_name = None
+                                query = ""
+                            else:
+                                query += " " + line
+
                 self.handle_export(selected_queries)
                 print(Fore.GREEN + "Queries executed successfully!")
         except FileNotFoundError:

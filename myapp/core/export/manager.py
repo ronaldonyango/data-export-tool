@@ -34,7 +34,7 @@ class ExportManager:
         ExportManager.print_export_formats()
         query_choice = ""
         while query_choice not in ["1", "2", "3"]:
-            query_choice = input("Enter your query_choice: ")
+            query_choice = input("Enter your export format choice: ")
         export_format = {"1": "csv", "2": "xlsx", "3": "json"}[query_choice]
         return export_format
 

@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 
 import pandas as pd
+import xlsxwriter
 
 from colorama import Fore
 from tqdm import tqdm
@@ -66,7 +67,6 @@ class DataExporter:
 
             elif export_format == 'json':
                 self._export_to_json(file_path, query)
-                print(Fore.LIGHTBLUE_EX, f"\nData exported to {file_path}")
                 print(Fore.LIGHTBLUE_EX, "--- %s seconds ---" % (time.monotonic() - start_time))
 
             else:
@@ -93,18 +93,37 @@ class DataExporter:
         # fetch data from the table
         header, rows = self.database_manager.fetch_table_data(query)
 
-        # Create a DataFrame
-        df = pd.DataFrame(rows, columns=header)
+        # Create a new Excel workbook and add a worksheet
+        workbook = xlsxwriter.Workbook(file_path)
+        worksheet = workbook.add_worksheet(table_name)
 
-        # Create a progress bar
-        progress_bar = tqdm(total=len(df), desc='Exporting to Excel', unit='row')
+        # Apply formatting to the worksheet
+        # Set column widths
+        column_widths = [len(str(header)) + 2 for header in header]
+        for i, width in enumerate(column_widths):
+            worksheet.set_column(i, i, width)
 
-        # Write DataFrame to Excel file
-        with pd.ExcelWriter(file_path) as writer:
-            df.to_excel(writer, sheet_name=table_name, index=False)
+        # Create a format for the header cells
+        header_format = workbook.add_format({'bold': True, 'bg_color': '#D3D3D3'})
 
-        progress_bar.update(len(df))
-        progress_bar.close()
+        # Create a format for the data cells with grid lines
+        data_format = workbook.add_format({'border': 1, 'border_color': '#D3D3D3'})
+
+        # Write the header row
+        for i, header in enumerate(header):
+            worksheet.write(0, i, header, header_format)
+
+        # Write the data rows with tqdm progress bar
+        with tqdm(total=len(rows), desc='Exporting data', unit='row') as progress_bar:
+            for row_num, row_data in enumerate(rows, start=1):
+                for col_num, cell_data in enumerate(row_data):
+                    worksheet.write(row_num, col_num, cell_data, data_format)
+                progress_bar.update(1)
+
+        # Close the workbook
+        workbook.close()
+
+        print(f"\nData exported to {file_path}")
 
     def _export_to_csv(self, file_path, mode, query):
         """
